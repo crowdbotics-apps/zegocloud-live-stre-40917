@@ -1,24 +1,119 @@
-import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const YourApp = () => {
+import 'react-native-get-random-values';
+import { v4 as uuid } from 'uuid';
+function YourApp() {
+  const navigation = useNavigation();
+  const [joinChannel, setJoinChannel] = useState('');
+
+  const createLive = () =>
+    navigation.navigate('LiveScreen', { type: 'create', channel: uuid() });
+  const joinLive = () =>
+    navigation.navigate('LiveScreen', { type: 'join', channel: joinChannel });
+
+
+    const inputContainerStyle = {
+      ...styles.joinChannelInput,
+      ...styles.input2
+    }
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to your brand new app!</Text>
+      <Text style={styles.title}>Livestream App</Text>
+      <View style={styles.createContainer}>
+        <TouchableOpacity style={styles.button} onPress={createLive}>
+          <Text style={{
+            fontSize:26,
+            color:'red',
+            fontWeight:'700'
+          }}>Start</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.joinContainer}>
+        <TextInput
+          value={joinChannel}
+          onChangeText={setJoinChannel}
+          placeholder="Enter Livestream Id"
+          style={inputContainerStyle}
+        />
+        <TouchableOpacity
+          onPress={joinLive}
+          disabled={joinChannel === ''}
+          style={[
+            styles.button,
+            { backgroundColor: joinChannel === '' ? '#555555' : '#78b0ff' },
+          ]}>
+          <Text style={[styles.buttonText,  {
+            fontWeight:'900',
+            color:'blue',
+            fontSize:30
+          }]}>Join</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  )
-};
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: 100,
-    padding: 13
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  text: {
-    fontSize: 20
+  title: {
+    fontSize: 30,
+    marginBottom: 50,
+    color: '#333',
   },
-})
+  createContainer: {
+    width: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  joinContainer: {
+    width: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+    paddingTop: 50,
+    borderTopWidth: 1,
+    borderColor: '#22222255',
+  },
+  joinChannelInput: {
+    backgroundColor: '#cccccc77',
+    width: '100%',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    fontSize: 17,
+    textAlign: 'center',
+  },
+  button: {
+    width: '100%',
+    marginTop: 15,
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#78b0ff',
+  },
+  buttonText: {
+   backgroundColor:'pink',
+   width:150,
+   alignSelf:'center'
+  },
+  input2 : {
+    borderWidth:3,
+    borderColor:'green'
+  }
+});
 
 export const YourAppModule = {
   name: "YourApp",
