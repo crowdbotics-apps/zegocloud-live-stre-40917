@@ -1,29 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  PermissionsAndroid,
-  ActivityIndicator,
-  Dimensions,
-  Share,
-  TouchableOpacity,
-} from 'react-native';
-
-import RtcEngine, {
-  ChannelProfile,
-  ClientRole,
-  RtcLocalView,
-  RtcRemoteView,
-  VideoRemoteState,
-} from 'react-native-agora';
-
+import { StyleSheet, Text, View, PermissionsAndroid, ActivityIndicator, Dimensions, Share, TouchableOpacity } from 'react-native';
+import RtcEngine, { ChannelProfile, ClientRole, RtcLocalView, RtcRemoteView, VideoRemoteState } from 'react-native-agora';
 const dimensions = {
   width: Dimensions.get('window').width,
-  height: Dimensions.get('window').height,
+  height: Dimensions.get('window').height
 };
 
-const videoStateMessage = (state) => {
+const videoStateMessage = state => {
   switch (state) {
     case VideoRemoteState.Stopped:
       return 'Video turned off by Host';
@@ -38,16 +21,9 @@ const videoStateMessage = (state) => {
 
 async function requestCameraAndAudioPermission() {
   try {
-    const granted = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    ]);
-    if (
-      granted['android.permission.RECORD_AUDIO'] ===
-        PermissionsAndroid.RESULTS.GRANTED &&
-      granted['android.permission.CAMERA'] ===
-        PermissionsAndroid.RESULTS.GRANTED
-    ) {
+    const granted = await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.CAMERA, PermissionsAndroid.PERMISSIONS.RECORD_AUDIO]);
+
+    if (granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED && granted['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED) {
       console.log('You can use the cameras & mic');
     } else {
       console.log('Permission denied');
@@ -57,20 +33,20 @@ async function requestCameraAndAudioPermission() {
   }
 }
 
- function LiveScreen(props) {
+function LiveScreen(props) {
   const isBroadcaster = props.route.params.type === 'create';
 
   const onShare = async () => {
     try {
-      const result = await Share.share({ message: props.route.params.channel });
+      const result = await Share.share({
+        message: props.route.params.channel
+      });
+
       if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
+        if (result.activityType) {// shared with activity type of result.activityType
+        } else {// shared
         }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
+      } else if (result.action === Share.dismissedAction) {// dismissed
       }
     } catch (error) {
       console.log(error.message);
@@ -78,30 +54,21 @@ async function requestCameraAndAudioPermission() {
   };
 
   const [joined, setJoined] = useState(false);
-  const [broadcasterVideoState, setBroadcasterVideoState] = useState(
-    VideoRemoteState.Decoding,
-  );
+  const [broadcasterVideoState, setBroadcasterVideoState] = useState(VideoRemoteState.Decoding);
   const AgoraEngine = useRef();
+
   const init = async () => {
-    AgoraEngine.current = await RtcEngine.create(
-      'eddb52f6012f42afb08ee6e1eab83dcb',
-    );
+    AgoraEngine.current = await RtcEngine.create('eddb52f6012f42afb08ee6e1eab83dcb');
     AgoraEngine.current.enableVideo();
     AgoraEngine.current.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    if (isBroadcaster)
-      AgoraEngine.current.setClientRole(ClientRole.Broadcaster);
-
+    if (isBroadcaster) AgoraEngine.current.setClientRole(ClientRole.Broadcaster);
     AgoraEngine.current.addListener('RemoteVideoStateChanged', (uid, state) => {
       if (uid === 1) setBroadcasterVideoState(state);
     });
-
-    AgoraEngine.current.addListener(
-      'JoinChannelSuccess',
-      (channel, uid, elapsed) => {
-        console.log('JoinChannelSuccess', channel, uid, elapsed);
-        setJoined(true);
-      },
-    );
+    AgoraEngine.current.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+      console.log('JoinChannelSuccess', channel, uid, elapsed);
+      setJoined(true);
+    });
   };
 
   const onSwitchCamera = () => AgoraEngine.current.switchCamera();
@@ -109,54 +76,25 @@ async function requestCameraAndAudioPermission() {
   useEffect(() => {
     if (Platform.OS === 'android') requestCameraAndAudioPermission();
     const uid = isBroadcaster ? 1 : 0;
-    init().then(() =>
-      AgoraEngine.current.joinChannel(
-        null,
-        props.route.params.channel,
-        null,
-        uid,
-      ),
-    );
+    init().then(() => AgoraEngine.current.joinChannel(null, props.route.params.channel, null, uid));
     return () => {
       AgoraEngine.current.destroy();
     };
   }, []);
 
-  const renderHost = () =>
-    broadcasterVideoState === VideoRemoteState.Decoding ? (
-      <RtcRemoteView.SurfaceView
-        uid={1}
-        style={styles.fullscreen}
-        channelId={props.route.params.channel}
-      />
-    ) : (
-      <View style={styles.broadcasterVideoStateMessage}>
+  const renderHost = () => broadcasterVideoState === VideoRemoteState.Decoding ? <RtcRemoteView.SurfaceView uid={1} style={styles.fullscreen} channelId={props.route.params.channel} /> : <View style={styles.broadcasterVideoStateMessage}>
         <Text style={styles.broadcasterVideoStateMessageText}>
           {videoStateMessage(broadcasterVideoState)}
         </Text>
-      </View>
-    );
+      </View>;
 
-  const renderLocal = () => (
-    <RtcLocalView.SurfaceView
-      style={styles.fullscreen}
-      channelId={props.route.params.channel}
-    />
-  );
+  const renderLocal = () => <RtcLocalView.SurfaceView style={styles.fullscreen} channelId={props.route.params.channel} />;
 
-  return (
-    <View style={styles.container}>
-      {!joined ? (
-        <>
-          <ActivityIndicator
-            size={60}
-            color="#222"
-            style={styles.activityIndicator}
-          />
+  return <View style={styles.container}>
+      {!joined ? <>
+          <ActivityIndicator size={60} color="#222" style={styles.activityIndicator} />
           <Text style={styles.loadingText}>Joining Stream, Please Wait</Text>
-        </>
-      ) : (
-        <>
+        </> : <>
           {isBroadcaster ? renderLocal() : renderHost()}
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={onShare}>
@@ -166,31 +104,29 @@ async function requestCameraAndAudioPermission() {
               <Text style={styles.buttonText}>Switch Camera</Text>
             </TouchableOpacity>
           </View>
-        </>
-      )}
-    </View>
-  );
+        </>}
+    </View>;
 }
+
 export default LiveScreen;
-  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   loadingText: {
     fontSize: 18,
-    color: '#222',
+    color: '#222'
   },
   fullscreen: {
     width: dimensions.width,
-    height: dimensions.height,
+    height: dimensions.height
   },
   buttonContainer: {
     flexDirection: 'row',
     position: 'absolute',
-    bottom: 0,
+    bottom: 0
   },
   button: {
     width: 150,
@@ -199,10 +135,10 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     borderRadius: 8,
     alignItems: 'center',
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   buttonText: {
-    fontSize: 17,
+    fontSize: 17
   },
   broadcasterVideoStateMessage: {
     position: 'absolute',
@@ -212,10 +148,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#222',
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    flex: 1
   },
   broadcasterVideoStateMessageText: {
     color: '#fff',
-    fontSize: 20,
-  },
+    fontSize: 20
+  }
 });

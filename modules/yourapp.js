@@ -1,64 +1,42 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import 'react-native-get-random-values';
 import { v4 as uuid } from 'uuid';
+
 function YourApp() {
   const navigation = useNavigation();
   const [joinChannel, setJoinChannel] = useState('');
 
-  const createLive = () =>
-    navigation.navigate('LiveScreen', { type: 'create', channel: uuid() });
-  const joinLive = () =>
-    navigation.navigate('LiveScreen', { type: 'join', channel: joinChannel });
+  const createLive = () => navigation.navigate('LiveScreen', {
+    type: 'create',
+    channel: uuid()
+  });
 
+  const joinLive = () => navigation.navigate('LiveScreen', {
+    type: 'join',
+    channel: joinChannel
+  });
 
-    const inputContainerStyle = {
-      ...styles.joinChannelInput,
-      ...styles.input2
-    }
-  return (
-    <View style={styles.container}>
+  const inputContainerStyle = { ...styles.joinChannelInput,
+    ...styles.input2
+  };
+  return <View style={styles.container}>
       <Text style={styles.title}>Livestream App</Text>
       <View style={styles.createContainer}>
         <TouchableOpacity style={styles.button} onPress={createLive}>
-          <Text style={{
-            fontSize:26,
-            color:'red',
-            fontWeight:'700'
-          }}>Start</Text>
+          <Text style={styles.xlcrwYAK}>Start</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.joinContainer}>
-        <TextInput
-          value={joinChannel}
-          onChangeText={setJoinChannel}
-          placeholder="Enter Livestream Id"
-          style={inputContainerStyle}
-        />
-        <TouchableOpacity
-          onPress={joinLive}
-          disabled={joinChannel === ''}
-          style={[
-            styles.button,
-            { backgroundColor: joinChannel === '' ? '#555555' : '#78b0ff' },
-          ]}>
-          <Text style={[styles.buttonText,  {
-            fontWeight:'900',
-            color:'blue',
-            fontSize:30
-          }]}>Join</Text>
+        <TextInput value={joinChannel} onChangeText={setJoinChannel} placeholder="Enter Livestream Id" style={inputContainerStyle} />
+        <TouchableOpacity onPress={joinLive} disabled={joinChannel === ''} style={[styles.button, {
+        backgroundColor: joinChannel === '' ? '#555555' : '#78b0ff'
+      }]}>
+          <Text style={[styles.buttonText, styles.FDEDnpVo]}>Join</Text>
         </TouchableOpacity>
       </View>
-    </View>
-  );
+    </View>;
 }
 
 const styles = StyleSheet.create({
@@ -66,17 +44,17 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   title: {
     fontSize: 30,
     marginBottom: 50,
-    color: '#333',
+    color: '#333'
   },
   createContainer: {
     width: '90%',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   joinContainer: {
     width: '90%',
@@ -85,7 +63,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingTop: 50,
     borderTopWidth: 1,
-    borderColor: '#22222255',
+    borderColor: '#22222255'
   },
   joinChannelInput: {
     backgroundColor: '#cccccc77',
@@ -93,7 +71,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 20,
     fontSize: 17,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   button: {
     width: '100%',
@@ -102,19 +80,28 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#78b0ff',
+    backgroundColor: '#78b0ff'
   },
   buttonText: {
-   backgroundColor:'pink',
-   width:150,
-   alignSelf:'center'
+    backgroundColor: 'pink',
+    width: 150,
+    alignSelf: 'center'
   },
-  input2 : {
-    borderWidth:3,
-    borderColor:'green'
+  input2: {
+    borderWidth: 3,
+    borderColor: 'green'
+  },
+  xlcrwYAK: {
+    fontSize: 26,
+    color: "red",
+    fontWeight: "700"
+  },
+  FDEDnpVo: {
+    fontWeight: "900",
+    color: "blue",
+    fontSize: 30
   }
 });
-
 export const YourAppModule = {
   name: "YourApp",
   path: "./",
@@ -123,4 +110,4 @@ export const YourAppModule = {
     title: "Your App",
     navigator: YourApp
   }
-}
+};
